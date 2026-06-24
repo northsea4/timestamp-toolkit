@@ -1,4 +1,4 @@
-import { setPendingSelection } from '../shared/storage'
+import { loadSettings, saveSettings, setPendingSelection } from '../shared/storage'
 
 const MENU_ID = 'parse-selection-with-time-toolkit'
 
@@ -19,5 +19,23 @@ chrome.contextMenus.onClicked.addListener((info) => {
     if (chrome.action.openPopup) {
       void chrome.action.openPopup()
     }
+  })
+})
+
+chrome.permissions.onAdded.addListener((permissions) => {
+  if (!permissions.permissions?.includes('clipboardRead')) return
+
+  void loadSettings().then((settings) => {
+    if (settings.autoReadClipboard) return
+    return saveSettings({ ...settings, autoReadClipboard: true })
+  })
+})
+
+chrome.permissions.onRemoved.addListener((permissions) => {
+  if (!permissions.permissions?.includes('clipboardRead')) return
+
+  void loadSettings().then((settings) => {
+    if (!settings.autoReadClipboard) return
+    return saveSettings({ ...settings, autoReadClipboard: false })
   })
 })

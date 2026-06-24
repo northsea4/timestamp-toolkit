@@ -34,6 +34,7 @@ interface ToastState {
 
 function PopupApp() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
+  const [settingsLoaded, setSettingsLoaded] = useState(false)
   const [view, setView] = useState<ViewName>('convert')
   const [input, setInput] = useState('')
   const [resultMode, setResultMode] = useState<ResultMode>('live')
@@ -54,6 +55,7 @@ function PopupApp() {
   useEffect(() => {
     void loadSettings().then((loaded) => {
       setSettings(loaded)
+      setSettingsLoaded(true)
       applyTheme(loaded.theme)
     })
     void loadHistory().then(setHistory)
@@ -70,9 +72,10 @@ function PopupApp() {
   }, [hasInput])
 
   useEffect(() => {
+    if (!settingsLoaded) return
     applyTheme(settings.theme)
     void saveSettings(settings)
-  }, [settings])
+  }, [settings, settingsLoaded])
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000)
