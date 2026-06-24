@@ -5,7 +5,8 @@
   "type": "module",
   "packageManager": "pnpm@10.33.3",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "vite build --watch",
+    "dev:server": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "format": "oxfmt src/ vite.config.ts tsconfig.json package.json .oxfmtrc.json .oxlintrc.json",
