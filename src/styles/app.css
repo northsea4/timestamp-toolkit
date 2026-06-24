@@ -613,13 +613,15 @@ select {
   display: grid;
   align-items: start;
   justify-items: center;
-  padding-top: 76px;
+  padding: 64px 14px 18px;
   background: rgba(0, 0, 0, 0.4);
 }
 
 .command-box {
-  width: 410px;
-  max-height: 430px;
+  width: min(410px, 100%);
+  max-height: calc(100vh - 82px);
+  display: grid;
+  grid-template-rows: 48px minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid var(--border-strong);
   border-radius: 14px;
@@ -647,9 +649,12 @@ select {
 }
 
 .command-results {
+  min-height: 0;
+  overflow-y: auto;
   display: grid;
+  align-content: start;
   gap: 4px;
-  padding: 8px;
+  padding: 8px 8px 12px;
 }
 
 .command-results button {
