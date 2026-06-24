@@ -1,12 +1,15 @@
 {
   "name": "timestamp-toolkit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.33.3",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview --host 127.0.0.1"
+    "preview": "vite preview --host 127.0.0.1",
+    "format": "oxfmt src/ vite.config.ts tsconfig.json package.json .oxfmtrc.json .oxlintrc.json",
+    "lint": "oxlint ."
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.1.1",
@@ -20,6 +23,8 @@
     "@types/chrome": "^0.1.31",
     "@types/node": "^26.0.0",
     "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "oxfmt": "^0.48.0",
+    "oxlint": "^1.63.0"
   }
 }

@@ -1,33 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
-import "../styles/app.css";
-import { DEFAULT_SETTINGS, TIMEZONES } from "../shared/constants";
-import { clearHistory, loadSettings, saveSettings } from "../shared/storage";
-import { applyTheme } from "../shared/theme";
-import type { Settings } from "../shared/types";
+import React, { useEffect, useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import '../styles/app.css'
+import { DEFAULT_SETTINGS, TIMEZONES } from '../shared/constants'
+import { clearHistory, loadSettings, saveSettings } from '../shared/storage'
+import { applyTheme } from '../shared/theme'
+import type { Settings } from '../shared/types'
 
 function OptionsApp() {
-  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
-  const [saved, setSaved] = useState(false);
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     void loadSettings().then((loaded) => {
-      setSettings(loaded);
-      applyTheme(loaded.theme);
-    });
-  }, []);
+      setSettings(loaded)
+      applyTheme(loaded.theme)
+    })
+  }, [])
 
   async function update(next: Settings) {
-    if (next.autoReadClipboard && !settings.autoReadClipboard && typeof chrome !== "undefined" && chrome.permissions) {
-      const granted = await chrome.permissions.request({ permissions: ["clipboardRead"] });
-      if (!granted) next = { ...next, autoReadClipboard: false };
+    if (
+      next.autoReadClipboard &&
+      !settings.autoReadClipboard &&
+      typeof chrome !== 'undefined' &&
+      chrome.permissions
+    ) {
+      const granted = await chrome.permissions.request({ permissions: ['clipboardRead'] })
+      if (!granted) next = { ...next, autoReadClipboard: false }
     }
 
-    setSettings(next);
-    applyTheme(next.theme);
-    await saveSettings(next);
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 1200);
+    setSettings(next)
+    applyTheme(next.theme)
+    await saveSettings(next)
+    setSaved(true)
+    window.setTimeout(() => setSaved(false), 1200)
   }
 
   return (
@@ -44,7 +49,11 @@ function OptionsApp() {
         <div className="settings-list wide">
           <label className="setting-row">
             <span>主题</span>
-            <select value={settings.theme} onChange={(event) => void update({ ...settings, theme: event.target.value as Settings["theme"] })}>
+            <select
+              value={settings.theme}
+              onChange={(event) =>
+                void update({ ...settings, theme: event.target.value as Settings['theme'] })
+              }>
               <option value="system">跟随系统</option>
               <option value="dark">深色</option>
               <option value="light">浅色</option>
@@ -52,7 +61,9 @@ function OptionsApp() {
           </label>
           <label className="setting-row">
             <span>默认时区</span>
-            <select value={settings.timezone} onChange={(event) => void update({ ...settings, timezone: event.target.value })}>
+            <select
+              value={settings.timezone}
+              onChange={(event) => void update({ ...settings, timezone: event.target.value })}>
               {TIMEZONES.map((timezone) => (
                 <option key={timezone.id} value={timezone.id}>
                   {timezone.label}
@@ -65,7 +76,9 @@ function OptionsApp() {
             <input
               type="checkbox"
               checked={settings.autoReadClipboard}
-              onChange={(event) => void update({ ...settings, autoReadClipboard: event.target.checked })}
+              onChange={(event) =>
+                void update({ ...settings, autoReadClipboard: event.target.checked })
+              }
             />
           </label>
           <label className="setting-row">
@@ -73,7 +86,9 @@ function OptionsApp() {
             <input
               type="checkbox"
               checked={settings.focusInputOnOpen}
-              onChange={(event) => void update({ ...settings, focusInputOnOpen: event.target.checked })}
+              onChange={(event) =>
+                void update({ ...settings, focusInputOnOpen: event.target.checked })
+              }
             />
           </label>
           <label className="setting-row">
@@ -81,7 +96,9 @@ function OptionsApp() {
             <input
               type="checkbox"
               checked={settings.historyEnabled}
-              onChange={(event) => void update({ ...settings, historyEnabled: event.target.checked })}
+              onChange={(event) =>
+                void update({ ...settings, historyEnabled: event.target.checked })
+              }
             />
           </label>
         </div>
@@ -97,7 +114,7 @@ function OptionsApp() {
         </div>
       </section>
     </main>
-  );
+  )
 }
 
-createRoot(document.getElementById("root")!).render(<OptionsApp />);
+createRoot(document.getElementById('root')!).render(<OptionsApp />)

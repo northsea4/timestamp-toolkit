@@ -1,77 +1,84 @@
-import { DEFAULT_SETTINGS, HISTORY_LIMIT } from "./constants";
-import type { HistoryItem, Settings } from "./types";
+import { DEFAULT_SETTINGS, HISTORY_LIMIT } from './constants'
+import type { HistoryItem, Settings } from './types'
 
-const SETTINGS_KEY = "settings";
-const HISTORY_KEY = "history";
-const PENDING_SELECTION_KEY = "pendingSelection";
+const SETTINGS_KEY = 'settings'
+const HISTORY_KEY = 'history'
+const PENDING_SELECTION_KEY = 'pendingSelection'
 
 function hasChromeStorage(): boolean {
-  return typeof chrome !== "undefined" && Boolean(chrome.storage);
+  return typeof chrome !== 'undefined' && Boolean(chrome.storage)
 }
 
 export async function loadSettings(): Promise<Settings> {
   if (!hasChromeStorage()) {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS;
+    const raw = localStorage.getItem(SETTINGS_KEY)
+    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS
   }
 
-  const result = await chrome.storage.sync.get(SETTINGS_KEY);
-  return { ...DEFAULT_SETTINGS, ...(result[SETTINGS_KEY] ?? {}) };
+  const result = await chrome.storage.sync.get(SETTINGS_KEY)
+  const stored = result[SETTINGS_KEY]
+  if (stored && typeof stored === 'object') {
+    return { ...DEFAULT_SETTINGS, ...(stored as Partial<Settings>) }
+  }
+
+  return DEFAULT_SETTINGS
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {
   if (!hasChromeStorage()) {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    return;
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
+    return
   }
 
-  await chrome.storage.sync.set({ [SETTINGS_KEY]: settings });
+  await chrome.storage.sync.set({ [SETTINGS_KEY]: settings })
 }
 
 export async function loadHistory(): Promise<HistoryItem[]> {
   if (!hasChromeStorage()) {
-    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? "[]");
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')
   }
 
-  const result = await chrome.storage.local.get(HISTORY_KEY);
-  return Array.isArray(result[HISTORY_KEY]) ? (result[HISTORY_KEY] as HistoryItem[]) : [];
+  const result = await chrome.storage.local.get(HISTORY_KEY)
+  return Array.isArray(result[HISTORY_KEY]) ? (result[HISTORY_KEY] as HistoryItem[]) : []
 }
 
-export async function addHistory(item: Omit<HistoryItem, "id" | "createdAt">): Promise<void> {
-  const history = await loadHistory();
+export async function addHistory(item: Omit<HistoryItem, 'id' | 'createdAt'>): Promise<void> {
+  const history = await loadHistory()
   const next: HistoryItem = {
     ...item,
     id: crypto.randomUUID(),
     createdAt: Date.now()
-  };
+  }
 
-  const deduped = history.filter((entry) => entry.source !== item.source || entry.timezone !== item.timezone);
-  await saveHistory([next, ...deduped].slice(0, HISTORY_LIMIT));
+  const deduped = history.filter(
+    (entry) => entry.source !== item.source || entry.timezone !== item.timezone
+  )
+  await saveHistory([next, ...deduped].slice(0, HISTORY_LIMIT))
 }
 
 export async function saveHistory(history: HistoryItem[]): Promise<void> {
   if (!hasChromeStorage()) {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-    return;
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history))
+    return
   }
 
-  await chrome.storage.local.set({ [HISTORY_KEY]: history });
+  await chrome.storage.local.set({ [HISTORY_KEY]: history })
 }
 
 export async function clearHistory(): Promise<void> {
-  await saveHistory([]);
+  await saveHistory([])
 }
 
 export async function takePendingSelection(): Promise<string | null> {
-  if (!hasChromeStorage()) return null;
+  if (!hasChromeStorage()) return null
 
-  const result = await chrome.storage.local.get(PENDING_SELECTION_KEY);
-  const value = result[PENDING_SELECTION_KEY] as string | undefined;
-  if (value) await chrome.storage.local.remove(PENDING_SELECTION_KEY);
-  return value ?? null;
+  const result = await chrome.storage.local.get(PENDING_SELECTION_KEY)
+  const value = result[PENDING_SELECTION_KEY] as string | undefined
+  if (value) await chrome.storage.local.remove(PENDING_SELECTION_KEY)
+  return value ?? null
 }
 
 export async function setPendingSelection(value: string): Promise<void> {
-  if (!hasChromeStorage()) return;
-  await chrome.storage.local.set({ [PENDING_SELECTION_KEY]: value });
+  if (!hasChromeStorage()) return
+  await chrome.storage.local.set({ [PENDING_SELECTION_KEY]: value })
 }

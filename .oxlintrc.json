@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react"],
+  "env": {
+    "browser": true,
+    "webextensions": true
+  },
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": [
+    "**/.github/**",
+    "**/coverage/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    ".agents/**",
+    ".claude/**",
+    ".codex/**",
+    ".cursor/**"
+  ],
+  "rules": {
+    "no-unused-vars": "off",
+    "no-empty-file": "off"
+  }
+}
