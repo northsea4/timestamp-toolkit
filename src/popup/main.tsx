@@ -141,6 +141,11 @@ function PopupApp() {
       if (parseTimeInput(text)) {
         setInput(text.trim())
         setResultMode('parse')
+        showToast('已读取剪贴板')
+        window.requestAnimationFrame(() => {
+          inputRef.current?.focus()
+          inputRef.current?.select()
+        })
       }
     } catch {
       // The toggle requests permission when enabled; this covers browsers that still deny reads.
