@@ -123,7 +123,7 @@ function PopupApp() {
     setToast(nextToast)
     window.setTimeout(() => {
       setToast((current) => (current?.id === nextToast.id ? null : current))
-    }, 2600)
+    }, 1800)
   }
 
   async function copyValue(value: string, label = '结果', source = input || value) {
