@@ -1,0 +1,17 @@
+.iconButton {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--muted);
+}
+
+.iconButton:hover,
+.iconButton.active {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--panel-3);
+}

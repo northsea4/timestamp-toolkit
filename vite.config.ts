@@ -27,10 +27,7 @@ function syncManifestVersion() {
   if (manifest.version !== packageJson.version) {
     writeFileSync(
       manifestPath,
-      manifestText.replace(
-        /("version"\s*:\s*)"[^"]+"/,
-        `$1${JSON.stringify(packageJson.version)}`
-      )
+      manifestText.replace(/("version"\s*:\s*)"[^"]+"/, `$1${JSON.stringify(packageJson.version)}`)
     )
   }
 }

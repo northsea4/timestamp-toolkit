@@ -10,10 +10,13 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "format": "oxfmt src/ vite.config.ts tsconfig.json package.json .oxfmtrc.json .oxlintrc.json",
-    "lint": "oxlint ."
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.1.1",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -26,6 +29,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "oxfmt": "^0.48.0",
-    "oxlint": "^1.63.0"
+    "oxlint": "^1.63.0",
+    "vitest": "^4.1.9"
   }
 }

@@ -1,0 +1,316 @@
+.view {
+  height: 544px;
+  overflow: hidden;
+  padding: 12px 14px 14px;
+  display: grid;
+  grid-template-rows: 74px 58px 1fr;
+  gap: 10px;
+}
+
+.inputCard {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  padding: 10px;
+  transition:
+    opacity 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.inputMuted {
+  composes: inputCard;
+  opacity: 0.62;
+}
+
+.inputMuted:focus-within {
+  opacity: 1;
+}
+
+.inputError {
+  composes: inputCard;
+  border-color: color-mix(in srgb, var(--warning) 58%, var(--border));
+  background: color-mix(in srgb, var(--warning) 8%, var(--panel));
+}
+
+.smartInputRow {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  background: var(--page-bg);
+  color: var(--muted);
+}
+
+.smartInputRow input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font:
+    650 17px/1.2 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+
+.smartInputRow input::placeholder {
+  color: var(--subtle);
+}
+
+.clearButton {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--muted);
+}
+
+.clearButton:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.inputMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 2px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.toolbar {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.modeSwitch {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.modeSwitch button {
+  height: 30px;
+  min-width: 54px;
+  border: 0;
+  border-radius: 7px;
+  padding: 0 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.modeSwitch button:hover {
+  color: var(--text);
+  background: var(--panel-2);
+}
+
+.modeSwitch button.modeSwitchActive {
+  color: #fff;
+  background: color-mix(in srgb, var(--live) 82%, #111113);
+}
+
+.parseActive .modeSwitch button.modeSwitchActive {
+  background: color-mix(in srgb, var(--accent) 86%, #111113);
+}
+
+.modeSwitchError .modeSwitch button.modeSwitchActive {
+  background: color-mix(in srgb, var(--warning) 88%, #111113);
+  color: #17120a;
+}
+
+.resultHeading {
+  min-width: 0;
+}
+
+.resultHeading strong,
+.resultHeading span {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.resultHeading strong {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.resultHeading span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.resultActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.livePauseButton {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.livePauseButton:hover {
+  border-color: var(--border-strong);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.livePauseButtonActive {
+  composes: livePauseButton;
+  color: #fff;
+  border-color: color-mix(in srgb, var(--live) 52%, var(--border));
+  background: color-mix(in srgb, var(--live) 42%, var(--panel));
+}
+
+.timezonePill {
+  position: relative;
+  height: 34px;
+  min-width: 88px;
+  max-width: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 13px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.timezonePill svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.timezonePill span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.timezonePill:hover {
+  border-color: var(--border-strong);
+  background: var(--panel-2);
+}
+
+.timezonePill select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.formatList {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: repeat(8, 1fr);
+  gap: 5px;
+}
+
+.resultPanel {
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+}
+
+.resultPanelLive {
+  composes: resultPanel;
+  border-color: color-mix(in srgb, var(--live) 38%, var(--border));
+}
+
+.resultPanelParse {
+  composes: resultPanel;
+  border-color: color-mix(in srgb, var(--accent) 46%, var(--border));
+  background: color-mix(in srgb, var(--accent) 6%, var(--panel));
+}
+
+.resultPanelError {
+  composes: resultPanel;
+  border-color: color-mix(in srgb, var(--warning) 55%, var(--border));
+  background: color-mix(in srgb, var(--warning) 9%, var(--panel));
+}
+
+.invalidState {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 18px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.invalidState svg {
+  color: var(--warning);
+}
+
+.invalidState strong {
+  color: var(--text);
+  font-size: 17px;
+}
+
+.invalidState span {
+  max-width: 340px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.invalidState button {
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--warning) 50%, var(--border));
+  border-radius: 9px;
+  padding: 0 13px;
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 850;
+}

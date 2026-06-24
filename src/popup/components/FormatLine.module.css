@@ -1,0 +1,67 @@
+.line {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 86px 1fr 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px 0 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--panel) 86%, transparent);
+}
+
+.primary {
+  background: var(--panel-2);
+  border-color: var(--border);
+}
+
+.primaryLive {
+  composes: primary;
+  border-color: color-mix(in srgb, var(--live) 35%, var(--border));
+}
+
+.primaryParse {
+  composes: primary;
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+}
+
+.label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.value {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text);
+  font:
+    650 12px/1.2 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+
+.copyButton {
+  width: 48px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.copyButton:hover {
+  background: color-mix(in srgb, var(--panel-3) 78%, transparent);
+  color: var(--text);
+}
+
+.copyButton:active {
+  transform: translateY(1px);
+}

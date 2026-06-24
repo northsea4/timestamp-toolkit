@@ -12,7 +12,12 @@ function hasChromeStorage(): boolean {
 export async function loadSettings(): Promise<Settings> {
   if (!hasChromeStorage()) {
     const raw = localStorage.getItem(SETTINGS_KEY)
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS
+    if (!raw) return DEFAULT_SETTINGS
+    try {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) }
+    } catch {
+      return DEFAULT_SETTINGS
+    }
   }
 
   const result = await chrome.storage.sync.get(SETTINGS_KEY)
@@ -35,7 +40,12 @@ export async function saveSettings(settings: Settings): Promise<void> {
 
 export async function loadHistory(): Promise<HistoryItem[]> {
   if (!hasChromeStorage()) {
-    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')
+    try {
+      const parsed = JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')
+      return Array.isArray(parsed) ? (parsed as HistoryItem[]) : []
+    } catch {
+      return []
+    }
   }
 
   const result = await chrome.storage.local.get(HISTORY_KEY)
