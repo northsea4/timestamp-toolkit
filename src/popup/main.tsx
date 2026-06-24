@@ -4,8 +4,11 @@ import {
   AlertTriangle,
   Command,
   Copy,
+  Globe2,
   History,
   Home,
+  Pause,
+  Play,
   Search,
   Settings as SettingsIcon,
   Trash2,
@@ -39,6 +42,7 @@ function PopupApp() {
   const [input, setInput] = useState('')
   const [resultMode, setResultMode] = useState<ResultMode>('live')
   const [now, setNow] = useState(() => new Date())
+  const [pausedLiveDate, setPausedLiveDate] = useState<Date | null>(null)
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [commandOpen, setCommandOpen] = useState(false)
   const [toast, setToast] = useState<ToastState | null>(null)
@@ -47,7 +51,8 @@ function PopupApp() {
 
   const parsed = useMemo(() => parseTimeInput(input), [input])
   const hasInput = input.trim().length > 0
-  const activeDate = resultMode === 'parse' && parsed ? parsed.date : now
+  const liveDate = pausedLiveDate ?? now
+  const activeDate = resultMode === 'parse' && parsed ? parsed.date : liveDate
   const rows = useMemo(
     () => makeFormatRows(activeDate, settings.timezone),
     [activeDate, settings.timezone]
@@ -75,6 +80,7 @@ function PopupApp() {
       if (selection) {
         setInput(selection)
         setResultMode('parse')
+        setPausedLiveDate(null)
       }
     })
   }, [])
@@ -90,9 +96,10 @@ function PopupApp() {
   }, [settings, settingsLoaded])
 
   useEffect(() => {
+    if (pausedLiveDate) return
     const timer = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(timer)
-  }, [])
+  }, [pausedLiveDate])
 
   useEffect(() => {
     if (settings.focusInputOnOpen && view === 'convert') {
@@ -114,7 +121,14 @@ function PopupApp() {
     lastParsedHistoryKey.current = historyKey
 
     void recordHistory(parsed.source, makeFormatRows(parsed.date, settings.timezone)[2].value)
-  }, [parsed, recordHistory, resultMode, settings.historyEnabled, settings.timezone, settingsLoaded])
+  }, [
+    parsed,
+    recordHistory,
+    resultMode,
+    settings.historyEnabled,
+    settings.timezone,
+    settingsLoaded
+  ])
 
   useEffect(() => {
     if (view === 'recent') void loadHistory().then(setHistory)
@@ -141,6 +155,7 @@ function PopupApp() {
       if (parseTimeInput(text)) {
         setInput(text.trim())
         setResultMode('parse')
+        setPausedLiveDate(null)
         showToast('已读取剪贴板')
         window.requestAnimationFrame(() => {
           inputRef.current?.focus()
@@ -191,14 +206,28 @@ function PopupApp() {
           inputRef={inputRef}
           setInput={(value) => {
             setInput(value)
-            if (value.trim()) setResultMode('parse')
+            if (value.trim()) {
+              setResultMode('parse')
+              setPausedLiveDate(null)
+            }
           }}
           settings={settings}
           setSettings={updateSettings}
           parsed={parsed}
           resultMode={resultMode}
           setResultMode={setResultMode}
-          now={now}
+          liveDate={liveDate}
+          isLivePaused={Boolean(pausedLiveDate)}
+          toggleLivePaused={() => {
+            if (pausedLiveDate) {
+              setPausedLiveDate(null)
+              setNow(new Date())
+              return
+            }
+            const snapshot = new Date()
+            setNow(snapshot)
+            setPausedLiveDate(snapshot)
+          }}
           copyValue={copyValue}
         />
       )}
@@ -208,6 +237,7 @@ function PopupApp() {
           restore={(value) => {
             setInput(value)
             setResultMode('parse')
+            setPausedLiveDate(null)
             setView('convert')
           }}
           copyValue={copyValue}
@@ -226,6 +256,7 @@ function PopupApp() {
           setInput={(value) => {
             setInput(value)
             setResultMode('parse')
+            setPausedLiveDate(null)
           }}
           copyValue={copyValue}
           close={() => setCommandOpen(false)}
@@ -281,7 +312,9 @@ function ConvertView({
   parsed,
   resultMode,
   setResultMode,
-  now,
+  liveDate,
+  isLivePaused,
+  toggleLivePaused,
   copyValue
 }: {
   input: string
@@ -292,14 +325,16 @@ function ConvertView({
   parsed: ParseResult | null
   resultMode: ResultMode
   setResultMode: (mode: ResultMode) => void
-  now: Date
+  liveDate: Date
+  isLivePaused: boolean
+  toggleLivePaused: () => void
   copyValue: (value: string, label?: string, source?: string) => Promise<void>
 }) {
   const trimmedInput = input.trim()
   const hasInput = trimmedInput.length > 0
   const isParseMode = resultMode === 'parse'
   const isError = isParseMode && hasInput && !parsed
-  const displayedDate = isParseMode && parsed ? parsed.date : now
+  const displayedDate = isParseMode && parsed ? parsed.date : liveDate
   const rows = makeFormatRows(displayedDate, settings.timezone).slice(0, 8)
   const timezoneLabel =
     TIMEZONES.find((timezone) => timezone.id === settings.timezone)?.label ?? settings.timezone
@@ -308,7 +343,9 @@ function ConvertView({
     ? '输入不是可识别的时间'
     : isParseMode && parsed
       ? `来自 ${parsed.source} · ${timestampUnitLabel(parsed.unit)}`
-      : '当前时间，持续更新'
+      : isLivePaused
+        ? '已暂停'
+        : '当前时间，持续更新'
 
   function focusParseInput() {
     inputRef.current?.focus()
@@ -392,18 +429,35 @@ function ConvertView({
           <strong>{title}</strong>
           <span>{meta}</span>
         </div>
-        <label className="timezone-pill">
-          <span>{timezoneLabel}</span>
-          <select
-            value={settings.timezone}
-            onChange={(event) => void setSettings({ ...settings, timezone: event.target.value })}>
-            {TIMEZONES.map((timezone) => (
-              <option key={timezone.id} value={timezone.id}>
-                {timezone.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="result-actions">
+          {!isParseMode && (
+            <button
+              className={
+                isLivePaused
+                  ? 'icon-button live-pause-button active'
+                  : 'icon-button live-pause-button'
+              }
+              type="button"
+              title={isLivePaused ? '恢复实时更新' : '暂停实时结果'}
+              aria-pressed={isLivePaused}
+              onClick={toggleLivePaused}>
+              {isLivePaused ? <Play size={15} /> : <Pause size={15} />}
+            </button>
+          )}
+          <label className="timezone-pill">
+            <Globe2 size={14} />
+            <span>{timezoneLabel}</span>
+            <select
+              value={settings.timezone}
+              onChange={(event) => void setSettings({ ...settings, timezone: event.target.value })}>
+              {TIMEZONES.map((timezone) => (
+                <option key={timezone.id} value={timezone.id}>
+                  {timezone.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </section>
 
       <section

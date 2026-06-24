@@ -339,18 +339,55 @@ select {
   font-size: 11px;
 }
 
+.result-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.live-pause-button {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+
+.live-pause-button.active {
+  color: #fff;
+  border-color: color-mix(in srgb, var(--live) 52%, var(--border));
+  background: color-mix(in srgb, var(--live) 42%, var(--panel));
+}
+
 .timezone-pill {
   position: relative;
   height: 34px;
-  min-width: 76px;
-  display: grid;
-  place-items: center;
+  min-width: 88px;
+  max-width: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 13px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--panel);
   color: var(--text);
   font-size: 12px;
   font-weight: 850;
+}
+
+.timezone-pill svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.timezone-pill span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .timezone-pill:hover {
