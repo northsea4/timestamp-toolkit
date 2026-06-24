@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import {
   AlertTriangle,
@@ -43,6 +43,7 @@ function PopupApp() {
   const [commandOpen, setCommandOpen] = useState(false)
   const [toast, setToast] = useState<ToastState | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const lastParsedHistoryKey = useRef<string | null>(null)
 
   const parsed = useMemo(() => parseTimeInput(input), [input])
   const hasInput = input.trim().length > 0
@@ -50,6 +51,17 @@ function PopupApp() {
   const rows = useMemo(
     () => makeFormatRows(activeDate, settings.timezone),
     [activeDate, settings.timezone]
+  )
+  const recordHistory = useCallback(
+    async (source: string, summary: string) => {
+      await addHistory({
+        source,
+        summary,
+        timezone: settings.timezone
+      })
+      setHistory(await loadHistory())
+    },
+    [settings.timezone]
   )
 
   useEffect(() => {
@@ -95,6 +107,20 @@ function PopupApp() {
   }, [settings.autoReadClipboard])
 
   useEffect(() => {
+    if (!settingsLoaded || !settings.historyEnabled || resultMode !== 'parse' || !parsed) return
+
+    const historyKey = `${parsed.source}\n${settings.timezone}`
+    if (lastParsedHistoryKey.current === historyKey) return
+    lastParsedHistoryKey.current = historyKey
+
+    void recordHistory(parsed.source, makeFormatRows(parsed.date, settings.timezone)[2].value)
+  }, [parsed, recordHistory, resultMode, settings.historyEnabled, settings.timezone, settingsLoaded])
+
+  useEffect(() => {
+    if (view === 'recent') void loadHistory().then(setHistory)
+  }, [view])
+
+  useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
@@ -129,22 +155,12 @@ function PopupApp() {
     }, 1800)
   }
 
-  async function copyValue(value: string, label = '结果', source = input || value) {
+  async function copyValue(value: string, label = '结果') {
     try {
       await navigator.clipboard.writeText(value)
       showToast(`已复制：${label}`)
     } catch {
       showToast('复制失败，请重试')
-      return
-    }
-
-    if (settings.historyEnabled) {
-      await addHistory({
-        source,
-        summary: value,
-        timezone: settings.timezone
-      })
-      setHistory(await loadHistory())
     }
   }
 
