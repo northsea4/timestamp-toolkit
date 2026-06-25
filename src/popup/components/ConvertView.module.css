@@ -132,7 +132,7 @@
   background: color-mix(in srgb, var(--accent) 86%, #111113);
 }
 
-.modeSwitchError .modeSwitch button.modeSwitchActive {
+.modeSwitchError button.modeSwitchActive {
   background: color-mix(in srgb, var(--warning) 88%, #111113);
   color: #17120a;
 }
